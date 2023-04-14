@@ -1,0 +1,117 @@
+package model;
+import java.util.LinkedList;
+
+public class HashTable<K, V> implements IHashTable<K, V> {
+    private LinkedList<Entry<K, V>>[] table;
+    private int size;
+
+    private static class Entry<K, V> {
+        K key;
+        V value;
+
+        public Entry(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
+    public HashTable(int capacity) {
+        table = new LinkedList[capacity];
+        size = 0;
+    }
+
+    @Override
+    public void put(K key, V value) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key cannot be null");
+        }
+
+        int hash = key.hashCode() % table.length;
+
+        if (table[hash] == null) {
+            table[hash] = new LinkedList<>();
+        }
+
+        for (Entry<K, V> entry : table[hash]) {
+            if (entry.key.equals(key)) {
+                entry.value = value;
+                return;
+            }
+        }
+
+        table[hash].add(new Entry<>(key, value));
+        size++;
+    }
+
+    @Override
+    public V get(K key) {
+        int hash = key.hashCode() % table.length;
+
+        if (table[hash] == null) {
+            return null;
+        }
+
+        for (Entry<K, V> entry : table[hash]) {
+            if (entry.key.equals(key)) {
+                return entry.value;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public boolean containsKey(K key) {
+        int hash = key.hashCode() % table.length;
+
+        if (table[hash] == null) {
+            return false;
+        }
+
+        for (Entry<K, V> entry : table[hash]) {
+            if (entry.key.equals(key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public V remove(K key) {
+        int hash = key.hashCode() % table.length;
+
+        if (table[hash] == null) {
+            return null;
+        }
+
+        for (Entry<K, V> entry : table[hash]) {
+            if (entry.key.equals(key)) {
+                table[hash].remove(entry);
+                size--;
+                return entry.value;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    @Override
+    public void clear() {
+        for (int i = 0; i < table.length; i++) {
+            table[i] = null;
+        }
+
+        size = 0;
+    }
+}
